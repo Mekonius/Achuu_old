@@ -1,0 +1,94 @@
+﻿@page "/products";
+
+@using Achuu.Data
+@using Achuu.Data.Services;
+@using System.Text.Json
+@*@inject ProductService productService;*@
+@inject IHttpClientFactory ClientFactory
+<PageTitle>Your Locker</PageTitle>
+
+<h1>Welcome to your locker</h1>
+
+<!-- unordered list with 3 list items-->
+@if (fetchedProduct?.Count() == 0)
+{
+    <p>List is empty</p>
+}
+else
+{
+    foreach (var ps in fetchedProduct!)
+    {
+       @* <div>
+            <div>
+                <div class="card">
+                    <div class="card-title">
+                        <h1>
+                            @ps.Name
+                        </h1>
+                    </div>
+                    <div class="card-img"><img width="250" src="@ShowImage(@ps.GalleryID!)"></div>
+
+                    <div class="card-group">
+                        <div class="card-footer" style="width: 100%;">
+                            @ps.Description
+                            <ul>
+                                @foreach (var i in ps.Ingredients!)
+                                {
+                                    <li>Navn: @i.Name</li>
+                                    <li>kan tåle: @i.IsAllergic</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    }
+}
+
+
+
+@code {
+
+    public class FetchedProduct
+    {
+        public int userId { get; set; }
+        public int id { get; set; }
+        public string? body { get; set; }
+        public string? title { get; set; }
+    }
+
+
+
+    private Product[]? products;
+
+    private List<FetchedProduct>? fetchedProduct;
+
+    private string? imageSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        fetchedProduct = new List<FetchedProduct>();
+        var data = new HttpRequestMessage(HttpMethod.Get, "http://makeup-api.herokuapp.com/api/v1/products.json");
+
+        var client = ClientFactory.CreateClient();
+        var response = await client.SendAsync(data);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            fetchedProduct = await JsonSerializer.DeserializeAsync<List<FetchedProduct>>(responseStream);
+        }
+
+
+        //products = await productService.GetProductsAsync(DateTime.Now);
+    }
+
+    private string ShowImage(string id)
+    {
+        return imageSource = $"/media/{id}.png";
+    }
+
+
+}
