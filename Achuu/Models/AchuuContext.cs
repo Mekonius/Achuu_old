@@ -11,6 +11,7 @@ namespace Achuu.Models
         public DbSet<Locker>? Lockers { get; set; } 
         public DbSet<Product>? Products { get; set; } 
         public DbSet<Ingredient>? Ingredients { get; set; }
+        public DbSet<ProductColor>? ProductColors { get; set; }
 
         public string DbPath { get;  }
 
@@ -21,7 +22,7 @@ namespace Achuu.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            
         }
     }
 

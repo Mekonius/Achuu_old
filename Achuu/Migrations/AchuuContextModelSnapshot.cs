@@ -67,16 +67,28 @@ namespace Achuu.Migrations
 
             modelBuilder.Entity("Achuu.Models.Product", b =>
                 {
-                    b.Property<int>("ProductID")
+                    b.Property<int?>("ProductID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("ProductID"));
+
+                    b.Property<string>("ApiFeatured_image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GalleryID")
+                    b.Property<string>("Image_link")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("LockerID")
@@ -85,14 +97,47 @@ namespace Achuu.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Warning")
+                    b.Property<string>("Price")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductApiUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ProductID");
 
                     b.HasIndex("LockerID");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Achuu.Models.ProductColor", b =>
+                {
+                    b.Property<int>("ProductColorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductColorId"));
+
+                    b.Property<string>("Colour_name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hex_value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductColorId");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("ProductColors");
                 });
 
             modelBuilder.Entity("Achuu.Models.User", b =>
@@ -162,6 +207,13 @@ namespace Achuu.Migrations
                         .HasForeignKey("LockerID");
                 });
 
+            modelBuilder.Entity("Achuu.Models.ProductColor", b =>
+                {
+                    b.HasOne("Achuu.Models.Product", null)
+                        .WithMany("ProductColors")
+                        .HasForeignKey("ProductID");
+                });
+
             modelBuilder.Entity("Achuu.Models.Locker", b =>
                 {
                     b.Navigation("Products");
@@ -170,6 +222,8 @@ namespace Achuu.Migrations
             modelBuilder.Entity("Achuu.Models.Product", b =>
                 {
                     b.Navigation("Ingredients");
+
+                    b.Navigation("ProductColors");
                 });
 
             modelBuilder.Entity("Achuu.Models.User", b =>

@@ -57,10 +57,17 @@ namespace Achuu.Migrations
                 {
                     ProductID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GalleryID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image_link = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Warning = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProductApiUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApiFeatured_image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LockerID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -94,6 +101,26 @@ namespace Achuu.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductColors",
+                columns: table => new
+                {
+                    ProductColorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Hex_value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Colour_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductColors", x => x.ProductColorId);
+                    table.ForeignKey(
+                        name: "FK_ProductColors_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ProductID");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Ingredients_ProductId",
                 table: "Ingredients",
@@ -106,6 +133,11 @@ namespace Achuu.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductColors_ProductID",
+                table: "ProductColors",
+                column: "ProductID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_LockerID",
                 table: "Products",
                 column: "LockerID");
@@ -116,6 +148,9 @@ namespace Achuu.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Ingredients");
+
+            migrationBuilder.DropTable(
+                name: "ProductColors");
 
             migrationBuilder.DropTable(
                 name: "Products");

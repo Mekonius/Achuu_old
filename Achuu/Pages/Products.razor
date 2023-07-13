@@ -25,6 +25,10 @@ else
             <h2>@product.Name</h2>
             <p>@product.Description</p>
             <h3>Ingredients</h3>
+            <p>Image</p>
+                <img src="@product.Image_link" alt="@product.Name" width="250"/>
+
+            
             @if (product.Ingredients != null && product.Ingredients.Count > 0)
             {
                 <ul>
@@ -44,10 +48,15 @@ else
 }
 
 @code {
-    private List<Product> products;
+    private List<Product>? products;
 
     protected override async Task OnInitializedAsync()
     {
+        productService.getJsonFeed();
+
+
         products = await productService.GetProductsAsync();
     }
+
+    
 }
