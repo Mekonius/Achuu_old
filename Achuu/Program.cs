@@ -1,16 +1,20 @@
-using Achuu.Data;
-using Achuu.Data.Services;
+using Achuu.Models;
+using Achuu.Models.Services;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddSingleton<ProductService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddDbContext<AchuuContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
 
 var app = builder.Build();
 

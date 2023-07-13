@@ -1,79 +1,53 @@
-﻿@page "/products";
+﻿@page "/products"
 
-@using Achuu.Data
-@using Achuu.Data.Services;
-@using System.Text.Json
-@inject ProductService productService;
-@inject IHttpClientFactory ClientFactory
-<PageTitle>Your Locker</PageTitle>
+@using Achuu.Models
+@using Achuu.Models.Services
 
-<h1>Welcome to your locker</h1>
+@inject ProductService productService
 
-<!-- unordered list with 3 list items-->
-@if (products?.Count() == 0)
+<PageTitle>Product List</PageTitle>
+
+<h1>Product List</h1>
+
+@if (products == null)
 {
-    <p>List is empty</p>
+    <p>Loading...</p>
+}
+else if (products.Count == 0)
+{
+    <p>No products found.</p>
 }
 else
 {
-    foreach (var ps in products!)
+    @foreach (var product in products)
     {
-       @* <div>
-            <div>
-                <div class="card">
-                    <div class="card-title">
-                        <h1>
-                            @ps.Name
-                        </h1>
-                    </div>
-                    <div class="card-img"><img width="250" src="@ShowImage(@ps.GalleryID!)"></div>
-
-                    <div class="card-group">
-                        <div class="card-footer" style="width: 100%;">
-                            @ps.Description
-                            <ul>
-                                @foreach (var i in ps.Ingredients!)
-                                {
-                                    <li>Navn: @i.Name</li>
-                                    <li>kan tåle: @i.IsAllergic</li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>*@
+        <div>
+            <h2>@product.Name</h2>
+            <p>@product.Description</p>
+            <h3>Ingredients</h3>
+            @if (product.Ingredients != null && product.Ingredients.Count > 0)
+            {
+                <ul>
+                    @foreach (var ingredient in product.Ingredients)
+                    {
+                        <li>@ingredient.Name - Can tolerate: @ingredient.IsAllergic</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No ingredients found.</p>
+            }
+        </div>
+        <hr />
     }
 }
 
-
-
 @code {
-    private List<Product>? products;
-
-    private string? imageSource;
+    private List<Product> products;
 
     protected override async Task OnInitializedAsync()
     {
-        var data = new HttpRequestMessage(HttpMethod.Get, "http://makeup-api.herokuapp.com/api/v1/products.json");
-
-        var client = ClientFactory.CreateClient();
-        var response = await client.SendAsync(data);
-
-        if (response.IsSuccessStatusCode)
-        {
-            await using var responseStream = await response.Content.ReadAsStreamAsync();
-            products = await JsonSerializer.DeserializeAsync<List<Product>>(responseStream);
-        }
-
-
-        //products = await productService.GetProductsAsync(DateTime.Now);
+        products = await productService.GetProductsAsync();
     }
-
-    private string ShowImage(string id)
-    {
-        return imageSource = $"/media/{id}.png";
-    }
-
-
 }

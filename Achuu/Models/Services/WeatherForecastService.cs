@@ -1,4 +1,4 @@
-namespace Achuu.Data.Services
+namespace Achuu.Models.Services
 {
     public class WeatherForecastService
     {

@@ -1,4 +1,4 @@
-﻿namespace Achuu.Data
+﻿namespace Achuu.Models
 {
     public class Product
     {
@@ -11,4 +11,5 @@
         public List<Ingredient>? Ingredients { get; set; }
 
     }
+
 }

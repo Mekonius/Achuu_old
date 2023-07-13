@@ -1,4 +1,4 @@
-﻿namespace Achuu.Data
+﻿namespace Achuu.Models
 {
     public class Gallery
     {
