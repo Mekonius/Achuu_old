@@ -60,23 +60,29 @@ namespace Achuu.Models.Services
                 // search for INGREDIENTS: in the description
                 if (ingredients != null)
                 {
-                    if (ingredients.Contains("INGREDIENTS:"))
+                    if (ingredients.Contains("Ingredients:"))
                     {
                         // split the string into an array
-                        var splitIngredients = ingredients.Split("INGREDIENTS:");
+                        var splitIngredients = ingredients.Split("Ingredients:");
                         // get the second element in the array
                         var ingredientList = splitIngredients[1];
                         // split the string into an array
                         var splitIngredientList = ingredientList.Split(",");
-                        // loop through the array
+                        // stop the reading the line after new line'
+                        splitIngredientList[splitIngredientList.Length - 1] = splitIngredientList[splitIngredientList.Length - 1].Split("\n")[0];
+
                         foreach (var ingredient in splitIngredientList)
                         {
                             // add each ingredient to the ingredients list of the product, and set the product id
-                            _context.Ingredients?.Add(new Ingredient { Name = ingredient, Product = product });
-                            _context.SaveChanges();
+                           
+                 
+                                _context.Ingredients?.Add(new Ingredient { Name = ingredient, Product = product });
+                                
+                            
                         }
 
-                       
+                        
+
                     }
 
                 }
@@ -85,13 +91,24 @@ namespace Achuu.Models.Services
                     continue;
                 }
 
-                products.Add(product);
+                //if the prodct is not already in the database, don't add it
+                if (_context.Products.Any(p => p.Name == product.Name))
+                {
+                    continue;
+                }
+                else
+                {
+                    products.Add(product);
+                    _context.Products?.Add(product);
+                    _context.SaveChanges();
 
-                _context.Products?.Add(product);
+                }
+
+
+
 
             }
 
-            //_context.SaveChanges();
 
         }
 
