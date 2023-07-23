@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Achuu.Models
 {
@@ -10,8 +11,8 @@ namespace Achuu.Models
         //public string? GalleryID { get; set; }
         //public string? Description { get; set; }
         //public string? Warning { get; set; }
-     
 
+        [Key] //This is the primary key
         public int? ProductID { get; set; }
         public string? Brand { get; set; }
         public string? Name { get; set; }

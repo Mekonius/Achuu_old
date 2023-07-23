@@ -13,7 +13,7 @@ namespace Achuu.Models
         public DbSet<Ingredient>? Ingredients { get; set; }
         public DbSet<ProductColor>? ProductColors { get; set; }
 
-        public string DbPath { get;  }
+        public string DbPath { get; } 
 
         public AchuuContext(DbContextOptions<AchuuContext> options) : base(options)
         {

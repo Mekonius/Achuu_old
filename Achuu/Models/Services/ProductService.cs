@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Achuu.Pages.Products;
+
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
+using System.Drawing.Printing;
+using System.Drawing.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -16,18 +21,48 @@ namespace Achuu.Models.Services
             _context = context;
         }
 
-        public async Task<List<Product>> GetProductsAsync()
+        //Creeate product 
+        public async Task CreateProductAsync(Product product)
         {
-            var products = await _context.Products!
-                .Include(p => p.Ingredients)
-                .ToListAsync();
+            _context.Products?.Add(product);
+            await _context.SaveChangesAsync();
+        }
 
-            return products;
+        public async Task<(List<Product> products, int totalItems)> DeleteProductAsync(int productId, int pageNumber, int pageSize)
+        {
+            var product = await _context.Products!.FindAsync(productId);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
+
+            return await GetProductsAsync(pageNumber, pageSize); // Return the updated list of products and total items after deletion
         }
 
 
 
-        public void getJsonFeed()
+        public async Task<(List<Product> products, int totalItems)> GetProductsAsync(int pageNumber, int pageSize)
+        {
+            var products = await _context.Products!
+                .Include(p => p.Ingredients)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var totalItems = await _context.Products!.CountAsync();
+
+            return (products, totalItems);
+        }
+
+
+
+
+
+
+
+
+        public void GetJsonFeed()
         {
 
 
@@ -42,6 +77,8 @@ namespace Achuu.Models.Services
                     // Remove the explicit value for ProductID
                     // ProductID = jsonElement.GetProperty("id").GetInt32(),
 
+
+                    // Add the explicit value for ProductID
                     Name = jsonElement.GetProperty("name").GetString(),
                     Description = jsonElement.GetProperty("description").GetString(),
                     Price = jsonElement.GetProperty("price").GetString(),
@@ -69,7 +106,7 @@ namespace Achuu.Models.Services
                         // split the string into an array
                         var splitIngredientList = ingredientList.Split(",");
                         // stop the reading the line after new line'
-                        splitIngredientList[splitIngredientList.Length - 1] = splitIngredientList[splitIngredientList.Length - 1].Split("\n")[0];
+                        splitIngredientList[^1] = splitIngredientList[^1].Split("\n")[0];
 
                         foreach (var ingredient in splitIngredientList)
                         {
@@ -92,14 +129,14 @@ namespace Achuu.Models.Services
                 }
 
                 //if the prodct is not already in the database, don't add it
-                if (_context.Products.Any(p => p.Name == product.Name))
+                if (product !=  null && _context.Products!.Any(p => p.Name == product.Name))
                 {
                     continue;
                 }
                 else
                 {
-                    products.Add(product);
-                    _context.Products?.Add(product);
+                    products.Add(product!);
+                    _context.Products?.Add(product!);
                     _context.SaveChanges();
 
                 }

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 
+using System.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -14,7 +16,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddDbContext<AchuuContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
+builder.Services.AddDbContext<AchuuContext>(options => 
+        options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
 
 var app = builder.Build();
 
