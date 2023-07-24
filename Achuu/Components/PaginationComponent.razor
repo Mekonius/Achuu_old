@@ -1,0 +1,24 @@
+﻿<!-- PaginationComponent.razor -->
+
+
+<button disabled="@IsFirstPage" @onclick="PreviousPage">Previous</button>
+<span>Page @pageNumber</span>
+<button disabled="@IsLastPage" @onclick="NextPage">Next</button>
+
+@code {
+    [Parameter] public int pageNumber { get; set; }
+    [Parameter] public bool IsFirstPage { get; set; }
+    [Parameter] public bool IsLastPage { get; set; }
+    [Parameter] public EventCallback OnPreviousClicked { get; set; }
+    [Parameter] public EventCallback OnNextClicked { get; set; }
+
+    private async Task PreviousPage()
+    {
+        await OnPreviousClicked.InvokeAsync();
+    }
+
+    private async Task NextPage()
+    {
+        await OnNextClicked.InvokeAsync();
+    }
+}

@@ -37,29 +37,31 @@ namespace Achuu.Models.Services
                 await _context.SaveChangesAsync();
             }
 
-            return await GetProductsAsync(pageNumber, pageSize); // Return the updated list of products and total items after deletion
+            var (resultProducts, totalItems, _) = await GetProductsAsync(pageNumber, pageSize);
+            return (resultProducts, totalItems); // Return the updated list of products and total items after deletion
         }
 
 
 
-        public async Task<(List<Product> products, int totalItems)> GetProductsAsync(int pageNumber, int pageSize)
+        public async Task<(List<Product> products, int totalItems, int pageNumber)> GetProductsAsync(int pageNumber, int pageSize)
         {
-            var products = await _context.Products!
-                .Include(p => p.Ingredients)
+            var productsQuery = _context.Products!
+                .Include(p => p.Ingredients);
+
+            var totalItems = await productsQuery.CountAsync();
+
+            // Debug information
+            Console.WriteLine($"Total products: {totalItems}");
+            Console.WriteLine($"Requested page number: {pageNumber}");
+            Console.WriteLine($"Requested page size: {pageSize}");
+
+            var products = await productsQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var totalItems = await _context.Products!.CountAsync();
-
-            return (products, totalItems);
+            return (products, totalItems, pageNumber);
         }
-
-
-
-
-
-
 
 
         public void GetJsonFeed()
