@@ -13,9 +13,6 @@
     {
         // Call the CreateProductAsync method from the ProductService to save the new product
         await productService.CreateProductAsync(newProduct);
-
-        // Reset the newProduct variable for a new entry
-        newProduct = new Product();
     }
 }
 

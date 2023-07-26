@@ -1,0 +1,55 @@
+﻿@page "/users";
+
+@using Achuu.Models.Services;
+@using Achuu.Models;
+<h3>CreateUser</h3>
+
+@inject UserService userService
+
+@code {
+
+    public User newUser = new User();
+
+    // This method will be called on form submission
+    public async Task CreateNewUser()
+    {
+        // Call the CreateProductAsync method from the ProductService to save the new product
+        await userService.CreateUserAsync(newUser);
+
+        // Reset the newProduct variable for a new entry
+        newUser = new User();
+    }
+
+}
+
+<!-- User create form -->
+
+<h3>Create</h3>
+
+<EditForm Model="newUser" OnValidSubmit="CreateNewUser">
+    <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <InputText id="Name" class="form-control" @bind-Value="newUser.Name" />
+        </div>
+
+        <div class="form-group">
+        <label for="Email">Email</label>
+        <InputText id="Email" class="form-control" @bind-Value="newUser.Email" />
+        </div>
+
+        <div class="form-group">
+        <label for="Password">Password</label>
+        <InputText id="Password" class="form-control" @bind-Value="newUser.Password" />
+        </div>
+
+                 
+
+            <!-- Add other fields as needed -->
+
+            <div class="form-group">
+                <!-- Use EventCallback to wrap the CreateNewProduct method -->
+                <button type="submit" class="btn btn-primary" @onclick="EventCallback.Factory.Create(this, CreateNewUser)">Create</button>
+        </div>
+</EditForm>

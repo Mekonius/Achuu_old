@@ -13,7 +13,7 @@ namespace Achuu.Models
         //public string? Warning { get; set; }
 
         [Key] //This is the primary key
-        public int? ProductID { get; set; }
+        public int ProductID { get; set; }
         public string? Brand { get; set; }
         public string? Name { get; set; }
         public string? Price { get; set; }

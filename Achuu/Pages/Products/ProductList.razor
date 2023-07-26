@@ -162,7 +162,7 @@ else
     private async Task DeleteProduct(Product product)
     {
         // Call the DeleteProductAsync method from the ProductService to delete the product
-        var result = await productService.DeleteProductAsync(product.ProductID.Value, currentPage, pageSize);
+        var result = await productService.DeleteProductAsync(product.ProductID, currentPage, pageSize);
         products = result.products;
         totalItems = result.totalItems;
     }

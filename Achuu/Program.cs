@@ -14,10 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddDbContext<AchuuContext>(options => 
-        options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
+builder.Services.AddDbContextFactory<AchuuContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")),ServiceLifetime.Scoped);
+
+builder.Services.AddTransient<AchuuContext>();
 
 var app = builder.Build();
 
