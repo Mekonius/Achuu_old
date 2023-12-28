@@ -1,4 +1,7 @@
 ﻿@page "/products"
+@inject IJSRuntime JSRuntime
+
+
 
 @using Achuu.Models
 @using Achuu.Models.Services
@@ -12,6 +15,51 @@
 
 <!-- a button that links to the create site -->
 <a href="/products/create">Create New Product</a>
+
+
+<button class="btn-get-json-feed" @onclick="GetJsonFeed">Get JSON Feed</button>
+
+
+
+@code {
+    private bool imageExists = true;
+    private string imageUrl = "@PlaceholderImage"; // Replace with your image URL
+}
+
+@code {
+    private async Task GetJsonFeed() => productService.GetJsonFeed();
+
+    private string PlaceHolderImage = "/media/250.png";
+
+    private async Task<bool> CheckImageExists(string imageUrl)
+    {
+        try
+        {
+            object[] args = { imageUrl };
+            var result = await JSRuntime.InvokeAsync<bool>("imageCheck.checkImage", args);
+
+            // Handle the result as needed
+            if (!result)
+            {
+                // Image does not exist, handle it here
+                return imageExists = false;
+            }else{
+                return imageExists = true;
+            }
+        }
+        catch (Exception)
+        {
+            // Handle the exception, e.g., display an error message.
+        }
+
+        return true;
+    }
+
+}
+
+
+
+
 
 @if (products == null)
 {
@@ -29,26 +77,20 @@ else
             <h2>@product.Name</h2>
             <p>@product.Description</p>
             <h3>Ingredients</h3>
-            <p>Image</p>
-            <img src="@product.Image_link" alt="@product.Name" width="250" />
 
-
-            @if (product.Ingredients != null && product.Ingredients.Count > 0)
+            @if (imageExists)
             {
-                <ul>
-                    @foreach (var ingredient in product.Ingredients)
-                    {
-                        <li>@ingredient.Name - Can tolerate: @ingredient.IsAllergic</li>
-                    }
-                </ul>
+                <img src="@product.Image_link" alt="Image" />
             }
             else
             {
-                <p>No ingredients found.</p>
+                <img src="@PlaceHolderImage" alt="Placeholder Image" />
             }
 
+            <br />
 
-            <button class="btn-delete" @onclick="() => ShowConfirmation(product)">X</button>
+
+            <button class="btn-delete" @onclick="() => ShowConfirmation(product)">Slet dette produkt</button>
 
 
             @if (showConfirmationModal)
@@ -67,14 +109,17 @@ else
 
         </div>
         <hr />
+        <script src="js/imageChecker.js"></script>
     }
     <PaginationComponent pageNumber="@pageNumber" IsFirstPage="@IsFirstPage" IsLastPage="@IsLastPage"
-                    OnPreviousClicked="PreviousPage" OnNextClicked="NextPage" />
+                         OnPreviousClicked="PreviousPage" OnNextClicked="NextPage" />
 }
 
+@inject IHttpClientFactory HttpClientFactory
+@using System.Net
 @code {
     private bool showConfirmationModal = false;
-    private Product ?product;
+    private Product? product;
     private List<Product>? products;
     private int currentPage = 1;
     private int pageSize = 10; // Adjust the number of items per page as needed
@@ -86,13 +131,28 @@ else
     private bool IsFirstPage => pageNumber == 1;
     private bool IsLastPage => products.Count < pageSize;
 
+    private async Task<string?> GetImageAsync(Product? product)
+    {
+        using var httpClient = HttpClientFactory.CreateClient();
 
+        var response = await httpClient.GetAsync(product.Image_link);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+
+            return $"data:image/png;base64,{bytes}";
+        }
+
+        return string.Empty; // TODO: Insert placeholder image...
+    }
 
 
 
     protected override async Task OnInitializedAsync()
     {
         //productService.GetJsonFeed();
+        await CheckImageExists(imageUrl);
         await LoadProductsAsync();
         await LoadData();
     }
