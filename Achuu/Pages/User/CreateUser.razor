@@ -8,16 +8,19 @@
 
 @code {
 
+    
+    
     public User newUser = new User();
 
     // This method will be called on form submission
     public async Task CreateNewUser()
     {
         // Call the CreateProductAsync method from the ProductService to save the new product
-        await userService.CreateUserAsync(newUser);
+    // Call the CreateUserAsync method from the UserService to save the new user
+    await userService.CreateUserAsync(newUser, newUser.Password);
 
-        // Reset the newProduct variable for a new entry
-        newUser = new User();
+    // Reset the newUser variable for a new entry
+    newUser = new User();
     }
 
 }
@@ -40,10 +43,9 @@
         </div>
 
         <div class="form-group">
-        <label for="Password">Password</label>
-        <InputText id="Password" class="form-control" @bind-Value="newUser.Password" />
+            <label for="Password">Password</label>
+            <InputText id="Password" class="form-control" @bind-Value="newUser.Password" />
         </div>
-
                  
 
             <!-- Add other fields as needed -->

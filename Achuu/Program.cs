@@ -15,10 +15,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddDbContextFactory<AchuuContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")),ServiceLifetime.Scoped);
+        options.UseSqlServer(builder.Configuration.GetConnectionString("AchuuContext")),ServiceLifetime.Scoped);
 
 builder.Services.AddTransient<AchuuContext>();
+
 
 var app = builder.Build();
 
@@ -33,7 +35,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();
