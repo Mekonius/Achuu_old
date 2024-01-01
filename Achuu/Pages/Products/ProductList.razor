@@ -31,28 +31,13 @@
 
     private string PlaceHolderImage = "/media/250.png";
 
-    private async Task<bool> CheckImageExists(string imageUrl)
+    private async Task CheckImage(Product product)
     {
-        try
+        var success = await JSRuntime.InvokeAsync<bool>("imageErrorCheck.checkImage", product.Image_link);
+        if (!success)
         {
-            object[] args = { imageUrl };
-            var result = await JSRuntime.InvokeAsync<bool>("imageCheck.checkImage", args);
-
-            // Handle the result as needed
-            if (!result)
-            {
-                // Image does not exist, handle it here
-                return imageExists = false;
-            }else{
-                return imageExists = true;
-            }
+            product.Image_link = PlaceHolderImage;
         }
-        catch (Exception)
-        {
-            // Handle the exception, e.g., display an error message.
-        }
-
-        return true;
     }
 
 }
@@ -78,14 +63,8 @@ else
             <p>@product.Description</p>
             <h3>Ingredients</h3>
 
-            @if (imageExists)
-            {
-                <img src="@product.Image_link" alt="Image" />
-            }
-            else
-            {
-                <img src="@PlaceHolderImage" alt="Placeholder Image" />
-            }
+            <img src="@product.Image_link" @onerror="async () => await CheckImage(product)" alt="Product image" />
+
 
             <br />
 
@@ -109,7 +88,6 @@ else
 
         </div>
         <hr />
-        <script src="js/imageChecker.js"></script>
     }
     <PaginationComponent pageNumber="@pageNumber" IsFirstPage="@IsFirstPage" IsLastPage="@IsLastPage"
                          OnPreviousClicked="PreviousPage" OnNextClicked="NextPage" />
@@ -152,7 +130,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         //productService.GetJsonFeed();
-        await CheckImageExists(imageUrl);
         await LoadProductsAsync();
         await LoadData();
     }
