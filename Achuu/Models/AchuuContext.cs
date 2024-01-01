@@ -25,10 +25,17 @@ namespace Achuu.Models
             _logger.LogInformation(" ======================= DbContext created. ========================== ");
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            
-        }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Name)
+            .IsUnique();
+
+    }
 
         public override void Dispose()
         {
@@ -36,6 +43,4 @@ namespace Achuu.Models
             _logger.LogInformation("DbContext disposed.");
         }
     }
-
-  
 }

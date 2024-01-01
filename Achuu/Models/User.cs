@@ -1,4 +1,6 @@
-﻿namespace Achuu.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Achuu.Models
 {
     public class User
     {

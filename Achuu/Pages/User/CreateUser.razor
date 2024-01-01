@@ -11,6 +11,8 @@
     
     
     public User newUser = new User();
+    public string Message { get; set; } = "";
+    public bool IsSuccess { get; set; } 
 
     // This method will be called on form submission
     public async Task CreateNewUser()
@@ -18,7 +20,16 @@
 
     if (newUser.Password != null)
     {
-        await userService.CreateUserAsync(newUser, newUser.Password);
+        try{
+            await userService.CreateUserAsync(newUser, newUser.Password);
+            Message = "User created successfully";
+            IsSuccess = true;
+        }
+        catch (Exception e)
+        {
+            Message = $"User Create Failed! {e.Message}";
+            IsSuccess = false;
+        }
     }
 
     // Reset the newUser variable for a new entry

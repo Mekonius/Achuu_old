@@ -18,7 +18,7 @@ namespace Achuu.Models.Services
         {
 
             using var context = _contextFactory.CreateDbContext();
-            var user = context.Users != null ? await context.Users.FirstOrDefaultAsync(u => u.Email == email): null;
+            var user = context.Users != null ? await context.Users.FirstOrDefaultAsync(u => u.Email == email) : null;
 
             if (user is null)
             {
@@ -47,8 +47,9 @@ namespace Achuu.Models.Services
 
         public async Task CreateUserAsync(User user, string password)
         {
-
             using var context = _contextFactory.CreateDbContext();
+            using var transaction = context.Database.BeginTransaction();
+
             var existingUser = context.Users != null
                 ? await context.Users.FirstOrDefaultAsync(u => (u.Email != null && u.Email.ToLower() == (user.Email ?? "").ToLower()) || (u.Name != null && u.Name.ToLower() == (user.Name ?? "").ToLower()))
                 : null;
@@ -56,7 +57,6 @@ namespace Achuu.Models.Services
             {
                 throw new Exception("User already exists");
             }
-
 
             byte[] salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())
@@ -70,14 +70,20 @@ namespace Achuu.Models.Services
                 prf: KeyDerivationPrf.HMACSHA512,
                 iterationCount: 10000,
                 numBytesRequested: 256 / 8));
-        
+
+            // Set the hashed password and salt to the user object
+            user.Hash = hashed;
+            user.Salt = Convert.ToBase64String(salt);
+
             if (context.Users != null)
             {
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
             }
+
+            await transaction.CommitAsync();
         }
-        
+
 
         //Edit User
         public async Task EditUserAsync(User user)
@@ -92,7 +98,7 @@ namespace Achuu.Models.Services
 
 
 
-        
+
 
     }
 }
