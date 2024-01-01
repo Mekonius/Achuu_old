@@ -1,8 +1,6 @@
 ﻿@page "/products"
 @inject IJSRuntime JSRuntime
 
-
-
 @using Achuu.Models
 @using Achuu.Models.Services
 @using Achuu.Components
@@ -16,10 +14,7 @@
 <!-- a button that links to the create site -->
 <a href="/products/create">Create New Product</a>
 
-
 <button class="btn-get-json-feed" @onclick="GetJsonFeed">Get JSON Feed</button>
-
-
 
 @code {
     private bool imageExists = true;
@@ -27,24 +22,19 @@
 }
 
 @code {
-    private async Task GetJsonFeed() => productService.GetJsonFeed();
+    private async Task GetJsonFeed() => await ((ProductService)productService).GetJsonFeed();
 
-    private string PlaceHolderImage = "/media/250.png";
+    private string PlaceholderImage = "/media/250.png";
 
     private async Task CheckImage(Product product)
     {
         var success = await JSRuntime.InvokeAsync<bool>("imageErrorCheck.checkImage", product.Image_link);
         if (!success)
         {
-            product.Image_link = PlaceHolderImage;
+            product.Image_link = PlaceholderImage;
         }
     }
-
 }
-
-
-
-
 
 @if (products == null)
 {
@@ -65,12 +55,9 @@ else
 
             <img src="@product.Image_link" @onerror="async () => await CheckImage(product)" alt="Product image" width="250" />
 
-
             <br />
 
-
             <button class="btn-delete" @onclick="() => ShowConfirmation(product)">Slet dette produkt</button>
-
 
             @if (showConfirmationModal)
             {
@@ -79,13 +66,12 @@ else
                         <p>Are you sure you want to delete this product?</p>
                         <button class="btn-confirm" @onclick="() => DeleteProduct(product)">Confirm</button>
                         <button class="btn-cancel" @onclick="() => CloseConfirmation()">Cancel</button>
-                        @{
+                        @*@{
                             showConfirmationModal = false;
-                        }
+                        }*@
                     </div>
                 </div>
             }
-
         </div>
         <hr />
     }
@@ -107,13 +93,13 @@ else
     private int totalItems;
 
     private bool IsFirstPage => pageNumber == 1;
-    private bool IsLastPage => products.Count < pageSize;
+    private bool IsLastPage => products != null && products.Count < pageSize;
 
     private async Task<string?> GetImageAsync(Product? product)
     {
         using var httpClient = HttpClientFactory.CreateClient();
 
-        var response = await httpClient.GetAsync(product.Image_link);
+        var response = await httpClient.GetAsync(product?.Image_link);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
@@ -125,11 +111,8 @@ else
         return string.Empty; // TODO: Insert placeholder image...
     }
 
-
-
     protected override async Task OnInitializedAsync()
     {
-        //productService.GetJsonFeed();
         await LoadProductsAsync();
         await LoadData();
     }
@@ -152,10 +135,9 @@ else
         }
         catch (Exception ex)
         {
-            // Handle the exception, e.g., display an error message.
+            Console.WriteLine(ex.Message);
         }
     }
-
 
     private async Task NextPage()
     {
@@ -172,16 +154,11 @@ else
         }
     }
 
-
     private async Task ChangePage(int page)
     {
         currentPage = page;
         await LoadProductsAsync();
     }
-
-
-
-
 
     // Method to show the confirmation modal
     private void ShowConfirmation(Product product)
@@ -195,14 +172,10 @@ else
         showConfirmationModal = false;
     }
 
-
     private async Task DeleteProduct(Product product)
     {
-        // Call the DeleteProductAsync method from the ProductService to delete the product
         var result = await productService.DeleteProductAsync(product.ProductID, currentPage, pageSize);
         products = result.products;
         totalItems = result.totalItems;
     }
-
 }
-

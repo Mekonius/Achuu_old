@@ -15,9 +15,11 @@
     // This method will be called on form submission
     public async Task CreateNewUser()
     {
-        // Call the CreateProductAsync method from the ProductService to save the new product
-    // Call the CreateUserAsync method from the UserService to save the new user
-    await userService.CreateUserAsync(newUser, newUser.Password);
+
+    if (newUser.Password != null)
+    {
+        await userService.CreateUserAsync(newUser, newUser.Password);
+    }
 
     // Reset the newUser variable for a new entry
     newUser = new User();

@@ -77,7 +77,7 @@ namespace Achuu.Models.Services
 
 
 
-        public object? GetJsonFeed()
+        public async Task GetJsonFeed()
         {
 
 
@@ -155,12 +155,10 @@ namespace Achuu.Models.Services
 
                 }
 
-
-
-                return products;
+                await Task.FromResult(products);
             }
 
-            return null;
+            await Task.CompletedTask;
 
 
         }

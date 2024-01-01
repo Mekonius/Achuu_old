@@ -18,23 +18,26 @@ namespace Achuu.Models.Services
         {
 
             using var context = _contextFactory.CreateDbContext();
-            var user = await context.Users?.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null)
+            if (user is null)
             {
                 throw new Exception("User not found");
             }
 
             // hash the provided password and compare it to the stored hash
-            string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: Convert.FromBase64String(user.Salt),
-                prf: KeyDerivationPrf.HMACSHA512,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
+            string hashedPassword = string.Empty;
+            if (user.Salt != null)
+            {
+                hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    password: password,
+                    salt: Convert.FromBase64String(user.Salt),
+                    prf: KeyDerivationPrf.HMACSHA512,
+                    iterationCount: 10000,
+                    numBytesRequested: 256 / 8));
+            }
 
-
-            if(user.Hash != hashedPassword)
+            if (user.Hash != hashedPassword)
             {
                 throw new Exception("Incorrect password");
             }
