@@ -18,7 +18,7 @@ namespace Achuu.Models.Services
         {
 
             using var context = _contextFactory.CreateDbContext();
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = context.Users != null ? await context.Users.FirstOrDefaultAsync(u => u.Email == email): null;
 
             if (user is null)
             {
@@ -49,8 +49,9 @@ namespace Achuu.Models.Services
         {
 
             using var context = _contextFactory.CreateDbContext();
-            var existingUser = await context.Users?.FirstOrDefaultAsync(u => u.Email.ToLower() == user.Email.ToLower() || u.Name.ToLower() == user.Name.ToLower());
-
+            var existingUser = context.Users != null
+                ? await context.Users.FirstOrDefaultAsync(u => (u.Email != null && u.Email.ToLower() == (user.Email ?? "").ToLower()) || (u.Name != null && u.Name.ToLower() == (user.Name ?? "").ToLower()))
+                : null;
             if (existingUser != null)
             {
                 throw new Exception("User already exists");
@@ -70,11 +71,11 @@ namespace Achuu.Models.Services
                 iterationCount: 10000,
                 numBytesRequested: 256 / 8));
         
-            user.Hash = hashed;
-            user.Salt = Convert.ToBase64String(salt);
-
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
+            if (context.Users != null)
+            {
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+            }
         }
         
 
@@ -82,8 +83,11 @@ namespace Achuu.Models.Services
         public async Task EditUserAsync(User user)
         {
             using var context = _contextFactory.CreateDbContext();
-            context.Users.Update(user);
-            await  context.SaveChangesAsync();
+            if (context.Users != null)
+            {
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+            }
         }
 
 
